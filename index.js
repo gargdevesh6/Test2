@@ -12,12 +12,12 @@ var port = process.env.PORT || 8080;
 const server = express();
 server.use(bodyParser.json());
 server.post('/getMovies',function (request,response)  {
-    if(request.body.result.parameters['top-rated']) {
-        var req = unirest("GET", "https://api.themoviedb.org/3/movie/top_rated");
+    if(request.body.queryResult.intent.displayName == 'top-rated') {
+        /*var req = unirest("GET", "https://api.themoviedb.org/3/movie/top_rated");
             req.query({
                 "page": "1",
                 "language": "en-US",
-                "api_key": ""
+                "api_key": "91e99dfcf1e642938974b8e3a5945491"
             });
             req.send("{}");
             req.end(function(res) {
@@ -33,14 +33,29 @@ server.post('/getMovies',function (request,response)  {
                     for(let i = 0; i<result.length;i++) {
                         output += result[i].title;
                         output+="\n"
-                    }
+                    }*/
                     response.setHeader('Content-Type', 'application/json');
                     response.send(JSON.stringify({
-                        "speech" : output,
-                        "displayText" : output
-                    })); 
-                }
-            });
+                        "fulfillmentText": "This is a text response",
+                        "fulfillmentMessages": [
+                          {
+                            "card": {
+                              "title": "card title",
+                              "subtitle": "card text",
+                              "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+                              "buttons": [
+                                {
+                                  "text": "button text",
+                                  "postback": "https://assistant.google.com/"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                        }
+                      )); 
+               // }
+          //  });
     } else if(request.body.result.parameters['movie-name']) {
      //   console.log('popular-movies param found');
         let movie = request.body.result.parameters['movie-name'];
@@ -50,7 +65,7 @@ server.post('/getMovies',function (request,response)  {
                 "page": "1",
                 "query":movie,
                 "language": "en-US",
-                "api_key": ""
+                "api_key": "91e99dfcf1e642938974b8e3a5945491"
             });
             req.send("{}");
             req.end(function(res) {
@@ -83,7 +98,7 @@ server.post('/getMovies',function (request,response)  {
             req.query({
                 "page": "1",
                 "language": "en-US",
-                "api_key": ""
+                "api_key": "91e99dfcf1e642938974b8e3a5945491"
             });
             req.send("{}");
             req.end(function(res){
@@ -111,6 +126,9 @@ server.post('/getMovies',function (request,response)  {
 });
 server.get('/getName',function (req,res){
     res.send('Devesh Garg');
+});
+server.get('/',function (req,res){
+    res.send('Welcome to the application');
 });
 server.listen(port, function () {
     console.log("Server is up and running...");
