@@ -3,40 +3,106 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('https');
+const mongoose     = require('mongoose');
 var unirest = require("unirest");
 let errorResposne = {
     results: []
 };
+mongoose.Promise = global.Promise;
+mongoose.connect("mongodb://test:Wipro@123@ds147011.mlab.com:47011/testdb_");
+
+var Schema = mongoose.Schema;
+var TeamInfoSchema = new Schema({
+name:{
+ type:String,
+ required:false
+}
+});
+var TeamInfoModel = mongoose.model('TeamInfoSchema');
+
+function getTeamInfo(req,res)
+{
+TeamInfoModel.findOne({name:'papa'},function(err,teamExists)
+      {
+        if (err)
+        {
+          return res.json({
+              speech: 'Something went wrong!',
+              displayText: 'Something went wrong!',
+              source: 'team info'
+          });
+        }
+if (teamExists)
+        {
+          return res.json({
+                speech: teamExists.name,
+                displayText: teamExists.name,
+                source: 'team info'
+            });
+        }
+        else {
+          return res.json({
+                speech: 'Currently I am not having information about this team',
+                displayText: 'Currently I am not having information about this team',
+                source: 'team info'
+            });
+        }
+      });
+}
+
 var port = process.env.PORT || 8080;
 // create serve and configure it.
 const server = express();
 server.use(bodyParser.json());
-server.post('/getMovies',function (request,response)  {
+server.post('/',function (request,response)  {
     if(request.body.queryResult.intent.displayName == 'top-rated') {
-        /*var req = unirest("GET", "https://api.themoviedb.org/3/movie/top_rated");
-            req.query({
-                "page": "1",
-                "language": "en-US",
-                "api_key": "91e99dfcf1e642938974b8e3a5945491"
+        getTeamInfo(req,res);
+        //start
+        var socket = require('socket.io-client')('wss://jcbcontroller.herokuapp.com');
+        socket.on('connect', function(){
+            console.log('connected');
+                        
+            socket.on('login', function(data){
+                console.log('login');
+                socket.emit('new message', 'HelloWorld'); //send location as a message
             });
-            req.send("{}");
-            req.end(function(res) {
-                if(res.error) {
-                    response.setHeader('Content-Type', 'application/json');
-                    response.send(JSON.stringify({
-                        "speech" : "Error. Can you try it again ? ",
-                        "displayText" : "Error. Can you try it again ? "
-                    }));
-                } else if(res.body.results.length > 0) {
-                    let result = res.body.results;
-                    let output = '';
-                    for(let i = 0; i<result.length;i++) {
-                        output += result[i].title;
-                        output+="\n"
-                    }*/
+            
+            socket.on('got message', function() {
+                socket.disconnect();
+            });
+            
+            socket.emit('add user', 'googlebaba'); //login as "Alexa`"
+        });
+        //end
                     response.setHeader('Content-Type', 'application/json');
                     response.send(JSON.stringify({
                         "fulfillmentText": "This is a text response",
+                        "fulfillmentMessages": [
+                        ]
+                        }
+                      )); 
+    } else if(request.body.queryResult.intent.displayName == 'favorite color') {
+                
+        //start
+        var socket = require('socket.io-client')('wss://jcbcontroller.herokuapp.com');
+        socket.on('connect', function(){
+            console.log('connected');
+                        
+            socket.on('login', function(data){
+                console.log('login');
+                socket.emit('new message', 'HelloWorld1'); //send location as a message
+            });
+            
+            socket.on('got message', function() {
+                socket.disconnect();
+            });
+            
+            socket.emit('add user', 'googlebaba'); //login as "Alexa`"
+        });
+        //end
+                    response.setHeader('Content-Type', 'application/json');
+                    response.send(JSON.stringify({
+                        "fulfillmentText": "Your choice is very bad I think",
                         "fulfillmentMessages": [
                           {
                             "card": {
@@ -54,74 +120,6 @@ server.post('/getMovies',function (request,response)  {
                         ]
                         }
                       )); 
-               // }
-          //  });
-    } else if(request.body.result.parameters['movie-name']) {
-     //   console.log('popular-movies param found');
-        let movie = request.body.result.parameters['movie-name'];
-        var req = unirest("GET", "https://api.themoviedb.org/3/search/movie");
-            req.query({
-                "include_adult": "false",
-                "page": "1",
-                "query":movie,
-                "language": "en-US",
-                "api_key": "91e99dfcf1e642938974b8e3a5945491"
-            });
-            req.send("{}");
-            req.end(function(res) {
-                if(res.error) {
-                    response.setHeader('Content-Type', 'application/json');
-                    response.send(JSON.stringify({
-                        "speech" : "Error. Can you try it again ? ",
-                        "displayText" : "Error. Can you try it again ? "
-                    }));
-                } else if(res.body.results.length > 0) {
-                let result = res.body.results[0];
-                let output = "Average Rating : " + result.vote_average + 
-                "\n Plot : " + result.overview + "url" + result.poster_path
-                    response.setHeader('Content-Type', 'application/json');
-                    response.send(JSON.stringify({
-                        "speech" : output,
-                        "displayText" : output
-                    }));
-                } else {
-                    response.setHeader('Content-Type', 'application/json');
-                    response.send(JSON.stringify({
-                        "speech" : "Couldn't find any deatails. :(  ",
-                        "displayText" : "Couldn't find any deatails. :(  "
-                    }));
-                }
-            });
-
-    } else if(request.body.result.parameters['popular-movies']) {    
-        var req = unirest("GET", "https://api.themoviedb.org/3/movie/popular");
-            req.query({
-                "page": "1",
-                "language": "en-US",
-                "api_key": "91e99dfcf1e642938974b8e3a5945491"
-            });
-            req.send("{}");
-            req.end(function(res){
-                if(res.error) {
-                    response.setHeader('Content-Type', 'application/json');
-                    response.send(JSON.stringify({
-                        "speech" : "Error. Can you try it again ? ",
-                        "displayText" : "Error. Can you try it again ? "
-                    }));
-                } else {
-                    let result = res.body.results;
-                    let output = '';
-                    for(let i = 0; i < result.length;i++) {
-                        output += result[i].title;
-                        output+="\n"
-                    }
-                    response.setHeader('Content-Type', 'application/json');
-                    response.send(JSON.stringify({
-                        "speech" : output,
-                        "displayText" : output
-                    })); 
-                }
-            });
     }
 });
 server.get('/getName',function (req,res){
