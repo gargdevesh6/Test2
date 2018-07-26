@@ -104,7 +104,7 @@ server.post('/',function (request,response)  {
         //end
                     response.setHeader('Content-Type', 'application/json');
                     response.send(JSON.stringify({
-                        "fulfillmentText": "What is your favorite fruit?",
+                        "fulfillmentText": "Thank you",
                         "fulfillmentMessages": [
                         ]
                         }
