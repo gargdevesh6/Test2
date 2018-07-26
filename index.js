@@ -3,68 +3,27 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('https');
-const mongoose     = require('mongoose');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://test:Wipro123@ds147011.mlab.com:47011/testdb_";
 var unirest = require("unirest");
 let errorResposne = {
     results: []
 };
-mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://test:Wipro@123@ds147011.mlab.com:47011/testdb_");
-
-var Schema = mongoose.Schema;
-var TeamInfoSchema = new Schema({
-name:{
- type:String,
- required:false
-}
-});
-var TeamInfoModel = mongoose.model('TeamInfoSchema');
-
-function getTeamInfo(req,res)
-{
-TeamInfoModel.findOne({name:'papa'},function(err,teamExists)
-      {
-        if (err)
-        {
-          return res.json({
-              speech: 'Something went wrong!',
-              displayText: 'Something went wrong!',
-              source: 'team info'
-          });
-        }
-if (teamExists)
-        {
-          return res.json({
-                speech: teamExists.name,
-                displayText: teamExists.name,
-                source: 'team info'
-            });
-        }
-        else {
-          return res.json({
-                speech: 'Currently I am not having information about this team',
-                displayText: 'Currently I am not having information about this team',
-                source: 'team info'
-            });
-        }
-      });
-}
 
 var port = process.env.PORT || 8080;
 // create serve and configure it.
 const server = express();
 server.use(bodyParser.json());
 server.post('/',function (request,response)  {
-    if(request.body.queryResult.intent.displayName == 'top-rated') {
-        getTeamInfo(req,res);
-        //start
+    if(request.body.queryResult.intent.displayName == 'favorite fruit') {
+        //start - socketio
         var socket = require('socket.io-client')('wss://jcbcontroller.herokuapp.com');
         socket.on('connect', function(){
             console.log('connected');
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'HelloWorld'); //send location as a message
+                socket.emit('new message', 'fruit'); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -74,13 +33,30 @@ server.post('/',function (request,response)  {
             socket.emit('add user', 'googlebaba'); //login as "Alexa`"
         });
         //end
-                    response.setHeader('Content-Type', 'application/json');
-                    response.send(JSON.stringify({
-                        "fulfillmentText": "This is a text response",
-                        "fulfillmentMessages": [
-                        ]
-                        }
-                      )); 
+
+        //start - mongodb write
+        MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
+            //if (err) return console.log('conection_error');
+            if (err) throw err;
+            /*Return only the documents where the address starts with an "S":*/
+            var db = client.db('testdb_');
+            var item = { command: "fruit", userResponse: request.body.queryResult.parameters.Fruits };
+            db.collection("called-intents").insertOne(item, function(err, result) {
+              if (err) console.log('not_found');
+              console.log('inserted');
+              client.close();
+            });
+          }); 
+        //end
+
+        response.setHeader('Content-Type', 'application/json');
+            response.send(JSON.stringify({
+                "fulfillmentText": "What's your favorite city?",
+                "fulfillmentMessages": [
+                ]
+                }
+              )); 
+                    
     } else if(request.body.queryResult.intent.displayName == 'favorite color') {
                 
         //start
@@ -90,7 +66,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'HelloWorld1'); //send location as a message
+                socket.emit('new message', 'color'); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -102,21 +78,34 @@ server.post('/',function (request,response)  {
         //end
                     response.setHeader('Content-Type', 'application/json');
                     response.send(JSON.stringify({
-                        "fulfillmentText": "Your choice is very bad I think",
+                        "fulfillmentText": "What is your favorite fruit?",
                         "fulfillmentMessages": [
-                          {
-                            "card": {
-                              "title": "card title",
-                              "subtitle": "card text",
-                              "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
-                              "buttons": [
-                                {
-                                  "text": "button text",
-                                  "postback": "https://assistant.google.com/"
-                                }
-                              ]
-                            }
-                          }
+                        ]
+                        }
+                      )); 
+    }  else if(request.body.queryResult.intent.displayName == 'favorite city') {
+                
+        //start
+        var socket = require('socket.io-client')('wss://jcbcontroller.herokuapp.com');
+        socket.on('connect', function(){
+            console.log('connected');
+                        
+            socket.on('login', function(data){
+                console.log('login');
+                socket.emit('new message', 'city'); //send location as a message
+            });
+            
+            socket.on('got message', function() {
+                socket.disconnect();
+            });
+            
+            socket.emit('add user', 'googlebaba'); //login as "Alexa`"
+        });
+        //end
+                    response.setHeader('Content-Type', 'application/json');
+                    response.send(JSON.stringify({
+                        "fulfillmentText": "What is your favorite fruit?",
+                        "fulfillmentMessages": [
                         ]
                         }
                       )); 
