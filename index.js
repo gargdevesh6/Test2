@@ -216,7 +216,7 @@ else
 
                     response.setHeader('Content-Type', 'application/json');
                     response.send(JSON.stringify({
-                        "fulfillmentText": "Thank you",
+                        "fulfillmentText": "What is your favorite color?",
                         "fulfillmentMessages": [
                         ]
                         }
