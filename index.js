@@ -62,7 +62,7 @@ server.post('/',function (request,response)  {
               )); 
                     
     } else if(request.body.queryResult.intent.displayName == 'favorite color') {
-        //var dis_response = request.body.queryResult.parameters.sys.color;
+        var dis_response = request.body.queryResult.parameters.color;
 
         //start - mongodb write
         MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
@@ -70,7 +70,7 @@ server.post('/',function (request,response)  {
             if (err) throw err;
             /*Return only the documents where the address starts with an "S":*/
             var db = client.db('testdb_');
-            var item = { command: "color", userResponse: JSON.stringify(request) };
+            var item = { command: "color", userResponse: dis_response };
             db.collection("called-intents").insertOne(item, function(err, result) {
               if (err) console.log('not_found');
               console.log('inserted');
@@ -88,7 +88,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', JSON.stringify(request)); //send location as a message
+                socket.emit('new message', 'color'); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -175,7 +175,7 @@ else
 
                     response.setHeader('Content-Type', 'application/json');
                     response.send(JSON.stringify({
-                        "fulfillmentText": 'qwerty',
+                        "fulfillmentText": "qwerty",
                         "fulfillmentMessages": [
                         ]
                         }
