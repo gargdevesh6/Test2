@@ -42,7 +42,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', ''); //send location as a message
+                socket.emit('new message', dis_response); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -162,7 +162,7 @@ else
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'city-'+ dis_response); //send location as a message
+                socket.emit('new message', 'city-'); //send location as a message
             });
             
             socket.on('got message', function() {
