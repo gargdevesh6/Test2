@@ -16,7 +16,7 @@ const server = express();
 server.use(bodyParser.json());
 server.post('/',function (request,response)  {
     if(request.body.queryResult.intent.displayName == 'favorite fruit') {
-        var response = request.body.queryResult.parameters.Fruits;
+        var dis_response = request.body.queryResult.parameters.Fruits;
 
         //start - mongodb write
         MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
@@ -24,7 +24,7 @@ server.post('/',function (request,response)  {
             if (err) throw err;
             /*Return only the documents where the address starts with an "S":*/
             var db = client.db('testdb_');
-            var item = { command: "fruit", userResponse: response };
+            var item = { command: "fruit", userResponse: dis_response };
             db.collection("called-intents").insertOne(item, function(err, result) {
               if (err) console.log('not_found');
               console.log('inserted');
@@ -41,7 +41,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'fruit-'+response); //send location as a message
+                socket.emit('new message', 'fruit-'+dis_response); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -61,7 +61,7 @@ server.post('/',function (request,response)  {
               )); 
                     
     } else if(request.body.queryResult.intent.displayName == 'favorite color') {
-        var response = request.body.queryResult.parameters.sys.color;
+        var dis_response = request.body.queryResult.parameters.sys.color;
 
         //start - mongodb write
         MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
@@ -69,7 +69,7 @@ server.post('/',function (request,response)  {
             if (err) throw err;
             /*Return only the documents where the address starts with an "S":*/
             var db = client.db('testdb_');
-            var item = { command: "color", userResponse: response };
+            var item = { command: "color", userResponse: dis_response };
             db.collection("called-intents").insertOne(item, function(err, result) {
               if (err) console.log('not_found');
               console.log('inserted');
@@ -87,7 +87,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'color-'+response); //send location as a message
+                socket.emit('new message', 'color-'+dis_response); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -107,7 +107,7 @@ server.post('/',function (request,response)  {
                         }
                       )); 
     }  else if(request.body.queryResult.intent.displayName == 'favorite city') {
-        var response = request.body.queryResult.parameters.Cities;
+        var dis_response = request.body.queryResult.parameters.Cities;
         var talkback = [];
         var talkback_resp = '';
 
@@ -117,7 +117,7 @@ server.post('/',function (request,response)  {
             if (err) throw err;
             /*Return only the documents where the address starts with an "S":*/
             var db = client.db('testdb_');
-            var item = { command: "city", userResponse: response };
+            var item = { command: "city", userResponse: dis_response };
             db.collection("called-intents").insertOne(item, function(err, result) {
               if (err) console.log('not_found');
               console.log('inserted');
@@ -161,7 +161,7 @@ else
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'city-'+ response); //send location as a message
+                socket.emit('new message', 'city-'+ dis_response); //send location as a message
             });
             
             socket.on('got message', function() {
