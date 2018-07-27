@@ -16,6 +16,7 @@ const server = express();
 server.use(bodyParser.json());
 server.post('/',function (request,response)  {
     if(request.body.queryResult.intent.displayName == 'favorite fruit') {
+        
         var dis_response = request.body.queryResult.parameters.Fruits;
 
         //start - mongodb write
@@ -41,7 +42,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'fruit-'+dis_response); //send location as a message
+                socket.emit('new message', ''); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -61,7 +62,7 @@ server.post('/',function (request,response)  {
               )); 
                     
     } else if(request.body.queryResult.intent.displayName == 'favorite color') {
-        var dis_response = request.body.queryResult.parameters.sys.color;
+        //var dis_response = request.body.queryResult.parameters.sys.color;
 
         //start - mongodb write
         MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
@@ -69,7 +70,7 @@ server.post('/',function (request,response)  {
             if (err) throw err;
             /*Return only the documents where the address starts with an "S":*/
             var db = client.db('testdb_');
-            var item = { command: "color", userResponse: dis_response };
+            var item = { command: "color", userResponse: 'kuchbhi' };
             db.collection("called-intents").insertOne(item, function(err, result) {
               if (err) console.log('not_found');
               console.log('inserted');
@@ -87,7 +88,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'color-'+dis_response); //send location as a message
+                socket.emit('new message', request); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -174,7 +175,7 @@ else
 
                     response.setHeader('Content-Type', 'application/json');
                     response.send(JSON.stringify({
-                        "fulfillmentText": talkback_resp,
+                        "fulfillmentText": 'qwerty',
                         "fulfillmentMessages": [
                         ]
                         }
