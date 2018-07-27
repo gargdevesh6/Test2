@@ -70,7 +70,7 @@ server.post('/',function (request,response)  {
             if (err) throw err;
             /*Return only the documents where the address starts with an "S":*/
             var db = client.db('testdb_');
-            var item = { command: "color", userResponse: 'kuchbhi' };
+            var item = { command: "color", userResponse: JSON.stringify(request) };
             db.collection("called-intents").insertOne(item, function(err, result) {
               if (err) console.log('not_found');
               console.log('inserted');
