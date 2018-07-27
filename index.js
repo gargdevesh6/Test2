@@ -88,7 +88,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'color'); //send location as a message
+                socket.emit('new message', dis_response); //send location as a message
             });
             
             socket.on('got message', function() {
@@ -128,12 +128,12 @@ server.post('/',function (request,response)  {
         //end
 
         
-
+/*
        //start - mongodb read
        MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
         //if (err) return console.log('conection_error');
         if (err) throw err;
-        /*Return only the documents where the address starts with an "S":*/
+        //Return only the documents where the address starts with an "S":
         var db = client.db('testdb_');
         //var query = { name: "Dada" };
         db.collection("called-intents").find().sort({_id:-1}).limit(4).toArray(function(err, result) {
@@ -154,7 +154,7 @@ if(talkback[3].command == 'welcome')
 else
     talkback_resp = 'Sorry the statement cannot be build';
 //end
-
+*/
         //start
         var socket = require('socket.io-client')('wss://jcbcontroller.herokuapp.com');
         socket.on('connect', function(){
@@ -162,7 +162,7 @@ else
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', 'city-'); //send location as a message
+                socket.emit('new message', dis_response); //send location as a message
             });
             
             socket.on('got message', function() {
