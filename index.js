@@ -88,7 +88,7 @@ server.post('/',function (request,response)  {
                         
             socket.on('login', function(data){
                 console.log('login');
-                socket.emit('new message', request); //send location as a message
+                socket.emit('new message', JSON.stringify(request)); //send location as a message
             });
             
             socket.on('got message', function() {
